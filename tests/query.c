@@ -1,17 +1,22 @@
 #include <config.h>
-#include <stdlib.h>
+#include <stdlib.h> //EXIT_SUCCESS, EXIT_FAILURE
 #include <check.h>
 #include "../src/query.h"
 
-START_TEST (test_name) {
-    const char *result = redirector_query("example.com");
-    printf(result);
-    ck_assert_int_eq(0, 1);
+START_TEST (test_valid_response) {
+    unsigned char result[1024];
+    size_t length = redirector_query("example.com", result);
+    ck_assert_int_ne(-1, length);
+    ck_assert_ptr_ne(NULL, result);
+
+    ck_assert_str_eq("url=http://example.org", result);
 }
 END_TEST
 
-START_TEST (test2_name) {
-    ck_assert(1);
+START_TEST (test_missing_response) {
+    unsigned char result[1024];
+    size_t length = redirector_query("missing.example.com", result);
+    ck_assert_int_eq(-1, length);
 }
 END_TEST
 
@@ -23,19 +28,12 @@ Suite * redirector_suite(void)
 
     s = suite_create("Redirector");
 
-    /* Core test case */
     tc_core = tcase_create("Core");
 
     //tcase_add_checked_fixture(tc_core, setup, teardown);
-    tcase_add_test(tc_core, test_name);
+    tcase_add_test(tc_core, test_valid_response);
+    tcase_add_test(tc_core, test_missing_response);
     suite_add_tcase(s, tc_core);
-
-    /* Limits test case */
-    //tc_limits = tcase_create("Limits");
-
-    //tcase_add_test(tc_limits, test_money_create_neg);
-    //tcase_add_test(tc_limits, test_money_create_zero);
-    //suite_add_tcase(s, tc_limits);
 
     return s;
 }
