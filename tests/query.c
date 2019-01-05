@@ -7,8 +7,6 @@ START_TEST (test_valid_response) {
     unsigned char result[1024];
     size_t length = redirector_query("example.com", result);
     ck_assert_int_ne(-1, length);
-    ck_assert_ptr_ne(NULL, result);
-
     ck_assert_str_eq("url=http://example.org", result);
 }
 END_TEST
@@ -17,6 +15,21 @@ START_TEST (test_missing_response) {
     unsigned char result[1024];
     size_t length = redirector_query("missing.example.com", result);
     ck_assert_int_eq(-1, length);
+}
+END_TEST
+
+START_TEST (test_invalid) {
+    unsigned char result[1024];
+    size_t length = redirector_query("!@#$^&*()_+-=", result);
+    ck_assert_int_eq(-1, length);
+}
+END_TEST
+
+START_TEST (test_punycode) {
+    unsigned char result[1024];
+    size_t length = redirector_query("✔️.example.com", result);
+    ck_assert_int_ne(-1, length);
+    ck_assert_str_eq("url=http://✔️.example.org", result);
 }
 END_TEST
 
@@ -33,6 +46,8 @@ Suite * redirector_suite(void)
     //tcase_add_checked_fixture(tc_core, setup, teardown);
     tcase_add_test(tc_core, test_valid_response);
     tcase_add_test(tc_core, test_missing_response);
+    tcase_add_test(tc_core, test_invalid);
+    tcase_add_test(tc_core, test_punycode);
     suite_add_tcase(s, tc_core);
 
     return s;

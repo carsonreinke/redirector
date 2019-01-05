@@ -2,11 +2,19 @@
 #include <netdb.h> //hstrerror
 #include <arpa/nameser.h> //NS_PACKETSZ, ns_*
 #include <resolv.h> //res_*
+#include <idn2.h>
 #include "utils.h"
 
 #define BUFFER_SIZE NS_PACKETSZ
 #define DOMAIN_PREFIX "_redirect."
 #define T_URI 256
+
+void redirectory_query_subdomain(const unsigned char *domain, unsigned char *subdomain) {
+    //if(strstr("www.", domain))
+
+    strcpy(subdomain, DOMAIN_PREFIX);
+    strcat(subdomain, domain);   
+}
 
 size_t redirector_query(const unsigned char *domain, unsigned char *dest) {
     int result;
@@ -23,6 +31,7 @@ size_t redirector_query(const unsigned char *domain, unsigned char *dest) {
     res_ninit(p_state);
 
     //Construct subdomain
+    redirectory_query_subdomain(domain, subdomain);
     strcpy(subdomain, DOMAIN_PREFIX);
     strcat(subdomain, domain);
 
