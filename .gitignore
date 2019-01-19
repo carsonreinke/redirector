@@ -41,3 +41,17 @@ m4/ltoptions.m4
 m4/ltsugar.m4
 m4/ltversion.m4
 m4/lt~obsolete.m4
+
+#Various other files to ignore
+**/Makefile
+config.h
+libtool
+**/.deps/
+**/.libs/
+**/*.o
+**/*.la
+**/*.lo
+**/*.log
+**/*.trs
+src/main
+tests/check_redirector

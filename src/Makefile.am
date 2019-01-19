@@ -2,7 +2,7 @@
 
 lib_LTLIBRARIES = libredirector.la
 libredirector_la_SOURCES = query.c query.h
-libredirector_la_LDFLAGS = -lresolv -lcheck
+libredirector_la_LDFLAGS = -lresolv -lcheck -lidn2
 
 bin_PROGRAMS = main
 main_SOURCES = main.c

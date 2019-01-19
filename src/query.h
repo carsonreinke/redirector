@@ -3,5 +3,5 @@
 
 #ifndef QUERY_H
 #define QUERY_H
-    size_t redirector_query(const unsigned char *domain, unsigned char *dest);
+    size_t redirector_query_txt(const unsigned char *domain, unsigned char **dest);
 #endif
