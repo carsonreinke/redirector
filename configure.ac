@@ -11,10 +11,10 @@ AC_PROG_CC
 AC_PROG_LIBTOOL
 
 # Checks for libraries.
-#AC_CHECK_LIB(resolv, res_query)
-#PKG_CHECK_MODULES([resolv])
+AC_CHECK_LIB(resolv, res_nquery)
 PKG_CHECK_MODULES([CHECK], [check >= 0.10.0])
 PKG_CHECK_MODULES([LIBIDN2], [libidn2 >= 2.0.0])
+AC_CHECK_LIB(uriparser, uriParseSingleUriA)
 
 # 
 AC_HEADER_STDC
