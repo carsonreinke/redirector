@@ -1,3 +1,5 @@
+#include <stdio.h> //stderr
+
 #ifndef UTILS_H
 #define UTILS_H
     //Turn of debug unless supplied with `gcc -DDEBUG`

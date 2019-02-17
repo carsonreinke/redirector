@@ -147,7 +147,7 @@ extern int redirector_query_txt(const unsigned char *domain, unsigned char **des
     else {
         free(*dest);
         *dest = NULL;
-        return REDIRECTOR_OK;
+        return REDIRECTOR_ERROR;
     }
 }
 

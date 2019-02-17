@@ -4,6 +4,7 @@
 #include "../src/utils.h"
 #include "../src/query.h"
 #include "../src/uri.h"
+#include "../src/redirector.h"
 
 START_TEST (test_valid_response) {
     unsigned char *result;
@@ -81,6 +82,13 @@ START_TEST (test_underflow) {
 }
 END_TEST
 
+START_TEST (test_overflow) {
+    unsigned char *result;
+    int length = redirector_query_txt("overflow.example.com", &result);
+    ck_assert_int_eq(REDIRECTOR_ERROR, length);
+}
+END_TEST
+
 START_TEST (test_empty) {
     unsigned char *result;
     int length = redirector_query_txt("", &result);
@@ -135,11 +143,40 @@ START_TEST (test_uri_garbage) {
 }
 END_TEST
 
+START_TEST (test_redirector) {
+    unsigned char *result;
+    result = redirector("example.com");
+    ck_assert_str_eq("http://example.org", result);
+    free(result);
+}
+END_TEST
+
+START_TEST (test_redirector_malformed) {
+    unsigned char *result;
+    result = redirector("malformed1.example.com");
+    ck_assert_ptr_null(result);
+
+    result = redirector("malformed2.example.com");
+    ck_assert_ptr_null(result);
+
+    result = redirector("malformed3.example.com");
+    ck_assert_ptr_null(result);
+}
+END_TEST
+
+START_TEST (test_redirector_overflow) {
+    unsigned char *result;
+    result = redirector("overflow.example.com");
+    ck_assert_ptr_null(result);
+}
+END_TEST
+
 Suite * redirector_suite(void)
 {
     Suite *s;
     TCase *tc_query;
     TCase *tc_uri;
+    TCase *tc_redirector;
 
     s = suite_create("Redirector");
 
@@ -154,6 +191,7 @@ Suite * redirector_suite(void)
     tcase_add_test(tc_query, test_punycode);
     tcase_add_test(tc_query, test_underflow);
     tcase_add_test(tc_query, test_empty);
+    tcase_add_test(tc_query, test_overflow);
     suite_add_tcase(s, tc_query);
 
     tc_uri = tcase_create("uri");
@@ -163,6 +201,12 @@ Suite * redirector_suite(void)
     tcase_add_test(tc_uri, test_uri_relative);
     tcase_add_test(tc_uri, test_uri_garbage);
     suite_add_tcase(s, tc_uri);
+
+    tc_redirector = tcase_create("redirector");
+    tcase_add_test(tc_redirector, test_redirector);
+    tcase_add_test(tc_redirector, test_redirector_malformed);
+    tcase_add_test(tc_redirector, test_redirector_overflow);
+    suite_add_tcase(s, tc_redirector);
 
     return s;
 }

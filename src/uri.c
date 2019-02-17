@@ -19,8 +19,19 @@ static bool redirector_uri_valid(UriUriA *uri) {
         return false;
     }
 
+    //Check to ensure we have a host name
+    if(uri->hostText.first == NULL || uri->hostText.afterLast == NULL) {
+        return false;
+    }
+    if(uri->hostText.afterLast - uri->hostText.first <= 0) {
+        return false;
+    }
+
     //Check if there is a scheme
     if(uri->scheme.first == NULL || uri->scheme.afterLast == NULL) {
+        return false;
+    }
+    if(uri->scheme.afterLast - uri->scheme.first <= 0) {
         return false;
     }
 
