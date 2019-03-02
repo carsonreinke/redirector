@@ -16,14 +16,14 @@
 #endif
 
 static unsigned char *redirector_query_remove_www(const unsigned char *domain) {
-    unsigned char *new_domain = calloc(strlen(domain) + 1, sizeof(unsigned char));
+    unsigned char *new_domain = calloc(redirector_strlen(domain) + 1, sizeof(unsigned char));
     unsigned char *lower_domain = redirector_strtolower(domain);
 
-    if(strstr(lower_domain, DOMAIN_WWW) == (char *)lower_domain) {
-        strcpy(new_domain, domain + strlen(DOMAIN_WWW));
+    if(redirector_strstr(lower_domain, DOMAIN_WWW) == (char *)lower_domain) {
+        redirector_strcpy(new_domain, domain + redirector_strlen(DOMAIN_WWW));
     }
     else {
-        strcpy(new_domain, domain);
+        redirector_strcpy(new_domain, domain);
     }
 
     free(lower_domain);
@@ -32,15 +32,15 @@ static unsigned char *redirector_query_remove_www(const unsigned char *domain) {
 
 static unsigned char *redirector_query_create_subdomain(const unsigned char *domain) {
     unsigned char *new_domain = redirector_query_remove_www(domain);
-    unsigned char *subdomain = calloc(strlen(new_domain) + strlen(DOMAIN_PREFIX) + 1, sizeof(unsigned char));
+    unsigned char *subdomain = calloc(redirector_strlen(new_domain) + redirector_strlen(DOMAIN_PREFIX) + 1, sizeof(unsigned char));
     unsigned char *encoded_subdomain;
 
-    strcpy(subdomain, DOMAIN_PREFIX);
-    strcat(subdomain, new_domain);
+    redirector_strcpy(subdomain, DOMAIN_PREFIX);
+    redirector_strcat(subdomain, new_domain);
 
     free(new_domain);
 
-    int result = idn2_to_ascii_8z(subdomain, (char **)&encoded_subdomain, IDN2_TRANSITIONAL);
+    int result = idn2_to_ascii_8z((const char *)subdomain, (char **)&encoded_subdomain, IDN2_TRANSITIONAL);
     if(result == IDN2_OK) {
         free(subdomain);
         subdomain = encoded_subdomain;
@@ -67,14 +67,14 @@ static int _redirector_query(const unsigned char *subdomain, int type, unsigned 
     }
 
     //Keep connection open to name server
-    state.options |= RES_STAYOPEN;
+    state.options = RES_STAYOPEN;
 
     if(res_ninit(p_state) == -1) {
         return REDIRECTOR_ERROR;
     }
 
     //Query domain for text
-    result = res_nsearch(p_state, subdomain, ns_c_in, type, buffer, sizeof(buffer));
+    result = res_nsearch(p_state, (const char *)subdomain, ns_c_in, type, buffer, sizeof(buffer));
 
     int res_h_errno = p_state->res_h_errno;
 
@@ -137,12 +137,12 @@ extern int redirector_query_txt(const unsigned char *domain, unsigned char **des
 
     //Super simple support RFC1464
     //TODO Double check this
-    if(strstr(*dest, VALUE_PREFIX) == (char *)*dest) {
-        unsigned char *new_dest = calloc(strlen(*dest) - strlen(VALUE_PREFIX) + 1, sizeof(unsigned char));
-        strcpy(new_dest, *dest + strlen(VALUE_PREFIX));
+    if(redirector_strstr(*dest, VALUE_PREFIX) == (char *)*dest) {
+        unsigned char *new_dest = calloc(redirector_strlen(*dest) - redirector_strlen(VALUE_PREFIX) + 1, sizeof(unsigned char));
+        redirector_strcpy(new_dest, *dest + redirector_strlen(VALUE_PREFIX));
         free(*dest);
         *dest = new_dest;
-        return strlen(*dest);
+        return redirector_strlen(*dest);
     }
     else {
         free(*dest);
@@ -168,10 +168,10 @@ extern int redirector_query_uri(const unsigned char *domain, unsigned char **des
     if(REDIRECTOR_SUCCESSFUL(result)) {
         unsigned char *new_dest = calloc(result + 1, sizeof(unsigned char));
         //Advanced pointer to skip priority and weight
-        strcpy(new_dest, *dest + ((NS_INT16SZ * 2) / sizeof(unsigned char)));
+        redirector_strcpy(new_dest, *dest + ((NS_INT16SZ * 2) / sizeof(unsigned char)));
         free(*dest);
         *dest = new_dest;
-        result = strlen(*dest);
+        result = redirector_strlen(*dest);
     }
 
     return result;

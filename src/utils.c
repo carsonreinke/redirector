@@ -1,6 +1,7 @@
 #include <stdlib.h> //calloc, NULL
 #include <ctype.h> //tolower
 #include <string.h> //strlen
+#include "utils.h"
 
 unsigned char *redirector_strtolower(const unsigned char* source) {
     unsigned char *dest;
@@ -9,8 +10,8 @@ unsigned char *redirector_strtolower(const unsigned char* source) {
         return NULL;
     }
 
-    dest = calloc(strlen(source) + 1, sizeof(unsigned char));
-    for(int index = 0; index < strlen(source); index++) {
+    dest = calloc(redirector_strlen(source) + 1, sizeof(unsigned char));
+    for(size_t index = 0; index < redirector_strlen(source); index++) {
         dest[index] = tolower(source[index]);
     }
 

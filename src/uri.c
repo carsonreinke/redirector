@@ -37,9 +37,9 @@ static bool redirector_uri_valid(UriUriA *uri) {
 
     //Check if scheme is even allowed
     scheme = calloc(uri->scheme.afterLast - uri->scheme.first + 1, sizeof(unsigned char));
-    strncpy(scheme, uri->scheme.first, uri->scheme.afterLast-uri->scheme.first);
-    bool schemeNotAllowed = strstr(scheme, SCHEME_HTTP) == NULL 
-        && strstr(scheme, SCHEME_HTTPS) == NULL;
+    redirector_strncpy(scheme, uri->scheme.first, uri->scheme.afterLast-uri->scheme.first);
+    bool schemeNotAllowed = redirector_strstr(scheme, SCHEME_HTTP) == NULL 
+        && redirector_strstr(scheme, SCHEME_HTTPS) == NULL;
     free(scheme);
     if(schemeNotAllowed) {
         return false;
@@ -58,11 +58,11 @@ static UriUriA *redirect_uri_parse(const unsigned char* source) {
     
     uri = malloc(sizeof(UriUriA));
     if(uri == NULL) {
-        debug_print("malloc failed", NULL);
+        debug_print("%s", "malloc failed");
         return NULL;
     }
 
-    if(result = (uriParseSingleUriA(uri, source, NULL)) != URI_SUCCESS) {
+    if( (result = (uriParseSingleUriA(uri, (const char *)source, NULL))) != URI_SUCCESS) {
         debug_print("Failed to parse %s because %d", source, result);
         free(uri);
         return NULL;
@@ -100,14 +100,14 @@ extern unsigned char *redirect_uri_normalize(const unsigned char* source) {
 
     dest = calloc(size, sizeof(unsigned char));
     if(dest == NULL) {
-        debug_print("calloc failure", NULL);
+        debug_print("%s", "calloc failure");
         uriFreeUriMembersA(uri);
         free(uri);
         return NULL;
     }
 
-    if((result = uriToStringA(dest, uri, size, NULL)) != URI_SUCCESS) {
-        debug_print("URI %s cannot be converted to string because", source, result);
+    if((result = uriToStringA((char *)dest, uri, size, NULL)) != URI_SUCCESS) {
+        debug_print("URI %s cannot be converted to string because %d", source, result);
         uriFreeUriMembersA(uri);
         free(uri);
         free(dest);

@@ -1,7 +1,22 @@
 ngx_module_type=CORE
-ngx_module_name=ngx_redirector_module
-ngx_module_deps="$ngx_addon_dir/src/ngx_redirector_module.h"
-ngx_module_srcs="$ngx_addon_dir/src/ngx_redirector_module.c"
+ngx_module_name=ngx_http_redirector_module
+ngx_module_incs=
+ngx_module_deps="\
+$ngx_addon_dir/nginx-src/ngx_http_redirector_module.h \
+$ngx_addon_dir/src/query.h \
+$ngx_addon_dir/src/utils.h \
+$ngx_addon_dir/src/uri.h \
+$ngx_addon_dir/src/redirector.h\
+"
+ngx_module_srcs="\
+$ngx_addon_dir/nginx-src/ngx_http_redirector_module.c \
+$ngx_addon_dir/src/query.c \
+$ngx_addon_dir/src/utils.c \
+$ngx_addon_dir/src/uri.c \
+$ngx_addon_dir/src/redirector.c\
+"
+ngx_module_libs="-lresolv -lidn2 -luriparser"
+ngx_module_link=ADDON
 
 . auto/module
 

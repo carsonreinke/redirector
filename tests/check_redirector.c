@@ -19,7 +19,7 @@ END_TEST
 START_TEST (test_valid_response_uri) {
     unsigned char *result;
     int length = redirector_query_uri("example.com", &result);
-    ck_assert_int_eq(strlen("http://example.org"), length);
+    ck_assert_int_eq(redirector_strlen("http://example.org"), length);
     ck_assert_ptr_nonnull(result);
     ck_assert_str_eq("http://example.org", result);
     free(result);
