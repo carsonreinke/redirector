@@ -55,3 +55,4 @@ libtool
 **/*.trs
 src/main
 tests/check_redirector
+t/*

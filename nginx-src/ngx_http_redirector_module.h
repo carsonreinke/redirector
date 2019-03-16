@@ -11,14 +11,14 @@
     static ngx_int_t ngx_http_redirector_handler(ngx_http_request_t *r);
     static void *ngx_http_redirector_create_loc_conf(ngx_conf_t *cf);
     static char *ngx_http_redirector_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child);
-    static char *ngx_http_redirector(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
+    //static char *ngx_http_redirector(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 
     static ngx_command_t ngx_http_redirector_commands[] = {
         { 
             ngx_string("redirector"),
             NGX_HTTP_SRV_CONF|NGX_CONF_TAKE1,
-            ngx_http_redirector,
-            NGX_HTTP_SRV_CONF_OFFSET,
+            ngx_http_set_complex_value_slot,
+            NGX_HTTP_LOC_CONF_OFFSET,
             offsetof(ngx_http_redirector_loc_conf_t, domain),
             NULL
         },
