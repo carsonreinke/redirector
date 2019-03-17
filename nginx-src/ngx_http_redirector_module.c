@@ -36,7 +36,7 @@ static ngx_int_t ngx_http_redirector_handler(ngx_http_request_t *r)
         redirector_debug_print("%s", "calloc failed");
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
-    memcpy(path + 1, r->unparsed_uri.data, r->unparsed_uri.len);
+    memcpy(path + (1 * sizeof(unsigned char)), r->unparsed_uri.data, r->unparsed_uri.len);
     path[0] = '.';
 
     //Find out where we should go

@@ -37,6 +37,10 @@ static bool redirector_uri_valid(UriUriA *uri) {
 
     //Check if scheme is even allowed
     scheme = calloc(uri->scheme.afterLast - uri->scheme.first + 1, sizeof(unsigned char));
+    if(scheme == NULL) {
+        redirector_debug_print("%s", "calloc failed");
+        return false;
+    }
     redirector_strncpy(scheme, uri->scheme.first, uri->scheme.afterLast-uri->scheme.first);
     bool schemeNotAllowed = redirector_strstr(scheme, SCHEME_HTTP) == NULL 
         && redirector_strstr(scheme, SCHEME_HTTPS) == NULL;

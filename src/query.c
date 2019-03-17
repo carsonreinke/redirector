@@ -19,6 +19,11 @@ static unsigned char *redirector_query_remove_www(const unsigned char *domain) {
     unsigned char *new_domain = calloc(redirector_strlen(domain) + 1, sizeof(unsigned char));
     unsigned char *lower_domain = redirector_strtolower(domain);
 
+    if(new_domain == NULL) {
+        redirector_debug_print("%s", "calloc failed");
+        return NULL;
+    }
+
     if(redirector_strstr(lower_domain, DOMAIN_WWW) == (char *)lower_domain) {
         redirector_strcpy(new_domain, domain + redirector_strlen(DOMAIN_WWW));
     }
@@ -34,6 +39,11 @@ static unsigned char *redirector_query_create_subdomain(const unsigned char *dom
     unsigned char *new_domain = redirector_query_remove_www(domain);
     unsigned char *subdomain = calloc(redirector_strlen(new_domain) + redirector_strlen(DOMAIN_PREFIX) + 1, sizeof(unsigned char));
     unsigned char *encoded_subdomain;
+
+    if(subdomain == NULL) {
+        redirector_debug_print("%s", "calloc failed");
+        return NULL;
+    }
 
     redirector_strcpy(subdomain, DOMAIN_PREFIX);
     redirector_strcat(subdomain, new_domain);
@@ -130,6 +140,10 @@ static int _redirector_query(const unsigned char *subdomain, int type, unsigned 
     const unsigned char *data = ns_rr_rdata(rr);
     size_t record_length = ns_rr_rdlen(rr);
     *dest = calloc(record_length + 1, sizeof(unsigned char));
+    if(*dest == NULL) {
+        redirector_debug_print("%s", "calloc failed");
+        return REDIRECTOR_ERROR;
+    }
     memcpy(*dest, data, record_length);
 
     return record_length;
@@ -157,6 +171,10 @@ extern int redirector_query_txt(const unsigned char *domain, unsigned char **des
     //TODO Double check this
     if(redirector_strstr(*dest, VALUE_PREFIX) == (char *)*dest) {
         unsigned char *new_dest = calloc(redirector_strlen(*dest) - redirector_strlen(VALUE_PREFIX) + 1, sizeof(unsigned char));
+        if(new_dest == NULL) {
+           redirector_debug_print("%s", "calloc failed");
+           return REDIRECTOR_ERROR; 
+        }
         redirector_strcpy(new_dest, *dest + redirector_strlen(VALUE_PREFIX));
         free(*dest);
         *dest = new_dest;
@@ -185,6 +203,10 @@ extern int redirector_query_uri(const unsigned char *domain, unsigned char **des
 
     if(REDIRECTOR_SUCCESSFUL(result)) {
         unsigned char *new_dest = calloc(result + 1, sizeof(unsigned char));
+        if(new_dest == NULL) {
+            return REDIRECTOR_ERROR;
+        }
+
         //Advanced pointer to skip priority and weight
         redirector_strcpy(new_dest, *dest + ((NS_INT16SZ * 2) / sizeof(unsigned char)));
         free(*dest);
