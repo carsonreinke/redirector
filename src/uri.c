@@ -71,8 +71,10 @@ static UriUriA *redirector_uri_parse(const unsigned char* source) {
     return uri;
 }
 
-extern unsigned char *redirector_uri_normalize(const unsigned char* source) {
+extern unsigned char *redirector_uri_normalize(const unsigned char *source, unsigned char *sourcePath) {
     UriUriA *uri;
+    UriUriA *path;
+    UriUriA *uriDest;
     int size;
     unsigned char *dest;
     int result;
@@ -81,19 +83,54 @@ extern unsigned char *redirector_uri_normalize(const unsigned char* source) {
         return NULL;
     }
 
+    //Nothing provided, default to root
+    if(sourcePath == NULL) {
+        sourcePath = "./";
+    }
+
     uri = redirector_uri_parse(source);
+    path = redirector_uri_parse(sourcePath);
 
     if(!redirector_uri_valid(uri)) {
         redirector_debug_print("URI is not valid %s", source);
         uriFreeUriMembersA(uri);
+        uriFreeUriMembersA(path);
         free(uri);
+        free(path);
         return NULL;
     }
 
-    if((result = uriToStringCharsRequiredA(uri, &size)) != URI_SUCCESS) {
-        redirector_debug_print("URI %s unable to get size because %d", source, result);
+    if((uriDest = malloc(sizeof(UriUriA))) == NULL) {
+        redirector_debug_print("%s", "malloc failed");
         uriFreeUriMembersA(uri);
+        uriFreeUriMembersA(path);
         free(uri);
+        free(path);
+        return NULL;
+    }
+
+    result = uriAddBaseUriA(uriDest, path, uri);
+    uriFreeUriMembersA(uri);
+    uriFreeUriMembersA(path);
+    free(uri);
+    free(path);
+    uri = NULL;
+    path = NULL;
+    if(result != URI_SUCCESS) {
+        redirector_debug_print("Unable to combine %s and %s", source, sourcePath);
+        return NULL;
+    }
+    if(uriNormalizeSyntaxA(uriDest) != URI_SUCCESS) {
+        redirector_debug_print("Unable to normalize %s%s", source, sourcePath);
+        uriFreeUriMembersA(uriDest);
+        free(uriDest);
+        return NULL;
+    }
+
+    if((result = uriToStringCharsRequiredA(uriDest, &size)) != URI_SUCCESS) {
+        redirector_debug_print("URI %s unable to get size because %d", source, result);
+        uriFreeUriMembersA(uriDest);
+        free(uriDest);
         return NULL;
     }
     size++;
@@ -101,20 +138,20 @@ extern unsigned char *redirector_uri_normalize(const unsigned char* source) {
     dest = calloc(size, sizeof(unsigned char));
     if(dest == NULL) {
         redirector_debug_print("%s", "calloc failure");
-        uriFreeUriMembersA(uri);
-        free(uri);
+        uriFreeUriMembersA(uriDest);
+        free(uriDest);
         return NULL;
     }
 
-    if((result = uriToStringA((char *)dest, uri, size, NULL)) != URI_SUCCESS) {
+    if((result = uriToStringA((char *)dest, uriDest, size, NULL)) != URI_SUCCESS) {
         redirector_debug_print("URI %s cannot be converted to string because %d", source, result);
-        uriFreeUriMembersA(uri);
-        free(uri);
+        uriFreeUriMembersA(uriDest);
+        free(uriDest);
         free(dest);
         return NULL;
     }
 
-    uriFreeUriMembersA(uri);
-    free(uri);
+    uriFreeUriMembersA(uriDest);
+    free(uriDest);
     return dest;
 }

@@ -97,10 +97,10 @@ START_TEST (test_empty) {
 END_TEST
 
 START_TEST (test_uri_valid) {
-    unsigned char *uri = "http://example.org";
+    unsigned char *uri = "http://example.org/";
     unsigned char *result;
 
-    result = redirector_uri_normalize(uri);
+    result = redirector_uri_normalize(uri, NULL);
     ck_assert_str_eq(uri, result);
 
     free(result);
@@ -111,8 +111,28 @@ START_TEST (test_uri_valid_path) {
     unsigned char *uri = "https://example.org/testing/";
     unsigned char *result;
 
-    result = redirector_uri_normalize(uri);
+    result = redirector_uri_normalize(uri, NULL);
     ck_assert_str_eq(uri, result);
+
+    free(result);
+}
+END_TEST
+
+START_TEST (test_uri_append_path) {
+    unsigned char *result;
+
+    result = redirector_uri_normalize("https://example.org/", "/testing/");
+    ck_assert_str_eq("https://example.org/testing/", result);
+
+    free(result);
+}
+END_TEST
+
+START_TEST (test_uri_append_uri) {
+    unsigned char *result;
+
+    result = redirector_uri_normalize("https://example.org/", "https://example.org/testing/");
+    ck_assert_str_eq("https://example.org/testing/", result);
 
     free(result);
 }
@@ -122,7 +142,7 @@ START_TEST (test_uri_ftp) {
     unsigned char *uri = "ftp://example.org";
     unsigned char *result;
 
-    result = redirector_uri_normalize(uri);
+    result = redirector_uri_normalize(uri, NULL);
     ck_assert_ptr_null(result);
 }
 END_TEST
@@ -130,7 +150,7 @@ END_TEST
 START_TEST (test_uri_relative) {
     unsigned char *result;
 
-    result = redirector_uri_normalize("./test");
+    result = redirector_uri_normalize("./test", NULL);
     ck_assert_ptr_null(result);
 }
 END_TEST
@@ -138,35 +158,35 @@ END_TEST
 START_TEST (test_uri_garbage) {
     unsigned char *result;
 
-    result = redirector_uri_normalize("~!#$^&*()_");
+    result = redirector_uri_normalize("~!#$^&*()_", NULL);
     ck_assert_ptr_null(result);
 }
 END_TEST
 
 START_TEST (test_redirector) {
     unsigned char *result;
-    result = redirector("example.com");
-    ck_assert_str_eq("http://example.org", result);
+    result = redirector("example.com", NULL);
+    ck_assert_str_eq("http://example.org/", result);
     free(result);
 }
 END_TEST
 
 START_TEST (test_redirector_malformed) {
     unsigned char *result;
-    result = redirector("malformed1.example.com");
+    result = redirector("malformed1.example.com", NULL);
     ck_assert_ptr_null(result);
 
-    result = redirector("malformed2.example.com");
+    result = redirector("malformed2.example.com", NULL);
     ck_assert_ptr_null(result);
 
-    result = redirector("malformed3.example.com");
+    result = redirector("malformed3.example.com", NULL);
     ck_assert_ptr_null(result);
 }
 END_TEST
 
 START_TEST (test_redirector_overflow) {
     unsigned char *result;
-    result = redirector("overflow.example.com");
+    result = redirector("overflow.example.com", NULL);
     ck_assert_ptr_null(result);
 }
 END_TEST
@@ -200,6 +220,8 @@ Suite * redirector_suite(void)
     tcase_add_test(tc_uri, test_uri_ftp);
     tcase_add_test(tc_uri, test_uri_relative);
     tcase_add_test(tc_uri, test_uri_garbage);
+    tcase_add_test(tc_uri, test_uri_append_path);
+    tcase_add_test(tc_uri, test_uri_append_uri);
     suite_add_tcase(s, tc_uri);
 
     tc_redirector = tcase_create("redirector");

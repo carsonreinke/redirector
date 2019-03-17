@@ -9,6 +9,7 @@ static ngx_int_t ngx_http_redirector_handler(ngx_http_request_t *r)
     ngx_http_redirector_loc_conf_t *cf;
     ngx_str_t domain;
     unsigned char *source;
+    unsigned char *path;
     unsigned char *dest;
     ngx_str_t dest_domain;
 
@@ -21,13 +22,27 @@ static ngx_int_t ngx_http_redirector_handler(ngx_http_request_t *r)
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
-    //Copy out a Nginx string
+    //Copy out a Nginx string for domain
     source = calloc(domain.len + 1, sizeof(unsigned char));
+    if(source == NULL) {
+        redirector_debug_print("%s", "calloc failed");
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+    }
     memcpy(source, domain.data, domain.len);
 
+    //Copy out request URI and prefix with "."
+    path = calloc(r->unparsed_uri.len + 2, sizeof(unsigned char));
+    if(path == NULL) {
+        redirector_debug_print("%s", "calloc failed");
+        return NGX_HTTP_INTERNAL_SERVER_ERROR;
+    }
+    memcpy(path + 1, r->unparsed_uri.data, r->unparsed_uri.len);
+    path[0] = '.';
+
     //Find out where we should go
-    dest = redirector(source);
+    dest = redirector(source, path);
     free(source);
+    free(path);
 
     //No results, just produce a 404
     if(dest == NULL) {

@@ -4,10 +4,14 @@
 #include "uri.h"
 #include "redirector.h"
 
-extern unsigned char *redirector(const unsigned char *domain) {
+extern unsigned char *redirector(const unsigned char *domain, unsigned char *request_uri) {
     int result;
     unsigned char *raw;
     unsigned char *formatted;
+
+    if(request_uri == NULL) {
+        request_uri = "/";
+    }
 
     result = redirector_query_txt(domain, &raw);
     if(REDIRECTOR_UNSUCCESSFUL(result)) {
@@ -17,7 +21,7 @@ extern unsigned char *redirector(const unsigned char *domain) {
         return NULL;
     }
 
-    formatted = redirector_uri_normalize(raw);
+    formatted = redirector_uri_normalize(raw, request_uri);
     free(raw);
     return formatted;
 }

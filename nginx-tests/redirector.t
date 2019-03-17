@@ -18,7 +18,7 @@ GET /
 --- response_body_like: Moved Permanently
 --- error_code: 301
 --- response_headers
-Location: http://example.org
+Location: http://example.org/
 
 === TEST 2: missing
 --- config
@@ -41,7 +41,7 @@ GET /test
 --- response_body_like: Moved Permanently
 --- error_code: 301
 --- response_headers
-Location: http://example.org
+Location: http://example.org/test
 
 === TEST 4: override location
 --- config
@@ -55,3 +55,33 @@ GET /test
 --- error_code: 200
 --- response_headers
 ! Location
+
+=== TEST 5: server variable
+--- config
+redirector $server_name;
+--- request
+GET /
+--- response_body_like: Moved Permanently
+--- error_code: 301
+--- response_headers
+Location: http://example.org/
+
+=== TEST 6: invalid path
+--- config
+redirector example.com;
+--- request
+GET http://example.net/
+--- response_body_like: Moved Permanently
+--- error_code: 301
+--- response_headers
+Location: http://example.org/
+
+=== TEST 7: valid query string
+--- config
+redirector example.com;
+--- request
+GET /?testing=it
+--- response_body_like: Moved Permanently
+--- error_code: 301
+--- response_headers
+Location: http://example.org/?testing=it
