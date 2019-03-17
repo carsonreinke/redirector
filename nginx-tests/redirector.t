@@ -29,3 +29,29 @@ GET /
 --- error_code: 404
 --- response_headers
 ! Location
+
+=== TEST 3: location
+--- config
+redirector example.com;
+
+location /test {
+}
+--- request
+GET /test
+--- response_body_like: Moved Permanently
+--- error_code: 301
+--- response_headers
+Location: http://example.org
+
+=== TEST 4: override location
+--- config
+redirector example.com;
+
+location /test {
+    return 200;
+}
+--- request
+GET /test
+--- error_code: 200
+--- response_headers
+! Location

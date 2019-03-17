@@ -100,7 +100,7 @@ START_TEST (test_uri_valid) {
     unsigned char *uri = "http://example.org";
     unsigned char *result;
 
-    result = redirect_uri_normalize(uri);
+    result = redirector_uri_normalize(uri);
     ck_assert_str_eq(uri, result);
 
     free(result);
@@ -111,7 +111,7 @@ START_TEST (test_uri_valid_path) {
     unsigned char *uri = "https://example.org/testing/";
     unsigned char *result;
 
-    result = redirect_uri_normalize(uri);
+    result = redirector_uri_normalize(uri);
     ck_assert_str_eq(uri, result);
 
     free(result);
@@ -122,7 +122,7 @@ START_TEST (test_uri_ftp) {
     unsigned char *uri = "ftp://example.org";
     unsigned char *result;
 
-    result = redirect_uri_normalize(uri);
+    result = redirector_uri_normalize(uri);
     ck_assert_ptr_null(result);
 }
 END_TEST
@@ -130,7 +130,7 @@ END_TEST
 START_TEST (test_uri_relative) {
     unsigned char *result;
 
-    result = redirect_uri_normalize("./test");
+    result = redirector_uri_normalize("./test");
     ck_assert_ptr_null(result);
 }
 END_TEST
@@ -138,7 +138,7 @@ END_TEST
 START_TEST (test_uri_garbage) {
     unsigned char *result;
 
-    result = redirect_uri_normalize("~!#$^&*()_");
+    result = redirector_uri_normalize("~!#$^&*()_");
     ck_assert_ptr_null(result);
 }
 END_TEST
@@ -223,5 +223,8 @@ int main(void)
     srunner_run_all(sr, CK_NORMAL);
     number_failed = srunner_ntests_failed(sr);
     srunner_free(sr);
+
+    redirector_query_deinit();
+
     return (number_failed == 0) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

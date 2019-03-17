@@ -10,7 +10,7 @@
     #define DEBUG 1
     #endif
 
-    #define debug_print(fmt, ...) \
+    #define redirector_debug_print(fmt, ...) \
         do { \
             if (DEBUG) \
                 fprintf(stderr, "%s:%d:%s(): " fmt "\n", __FILE__, __LINE__, __func__, __VA_ARGS__); \

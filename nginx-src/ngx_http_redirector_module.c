@@ -13,7 +13,6 @@ static ngx_int_t ngx_http_redirector_handler(ngx_http_request_t *r)
     ngx_str_t dest_domain;
 
     cf = ngx_http_get_module_loc_conf(r, ngx_http_redirector_module);
-
     if(cf == NULL || !cf->domain) {
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
@@ -22,19 +21,24 @@ static ngx_int_t ngx_http_redirector_handler(ngx_http_request_t *r)
         return NGX_HTTP_INTERNAL_SERVER_ERROR;
     }
 
-    source = ngx_calloc(domain.len + 1, r->connection->log);
+    //Copy out a Nginx string
+    source = calloc(domain.len + 1, sizeof(unsigned char));
     memcpy(source, domain.data, domain.len);
 
+    //Find out where we should go
     dest = redirector(source);
-    ngx_free(source);
+    free(source);
 
+    //No results, just produce a 404
     if(dest == NULL) {
         return NGX_HTTP_NOT_FOUND;
     }
 
-    //free(dest); //TODO
-    dest_domain.data = dest;
+    //Copy into a Nginx string
+    dest_domain.data = ngx_alloc(redirector_strlen(dest), r->connection->log);
     dest_domain.len = redirector_strlen(dest);
+    ngx_memcpy(dest_domain.data, dest, dest_domain.len);
+    free(dest);
 
     r->headers_out.location = ngx_list_push(&r->headers_out.headers);
     if(r->headers_out.location == NULL) {
@@ -44,7 +48,7 @@ static ngx_int_t ngx_http_redirector_handler(ngx_http_request_t *r)
     ngx_str_set(&r->headers_out.location->key, "Location");
     r->headers_out.location->value = dest_domain;
 
-    //TODO Free dest_domain?
+    //TODO Does `dest_domain` need to be freed?
 
     return NGX_HTTP_MOVED_PERMANENTLY;
 }
@@ -63,15 +67,18 @@ static void *ngx_http_redirector_create_loc_conf(ngx_conf_t *cf) {
 static char *ngx_http_redirector_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child) {
     ngx_http_redirector_loc_conf_t *prev = parent;
     ngx_http_redirector_loc_conf_t *conf = child;
+    ngx_http_core_loc_conf_t *clcf;
 
+    //Supply the selected domain from the parents to the children
     if(prev->domain) {
         conf->domain = prev->domain;
     }
-    //ngx_conf_merge_ptr_value(conf->domain, prev->domain, NULL);
 
-    ngx_http_core_loc_conf_t *clcf;
+    //Supply our handler if none is supplied
     clcf = ngx_http_conf_get_module_loc_conf(cf, ngx_http_core_module);
-    clcf->handler = ngx_http_redirector_handler;
+    if(clcf->handler == NULL) {
+        clcf->handler = ngx_http_redirector_handler;
+    }
 
     return NGX_CONF_OK;
 }

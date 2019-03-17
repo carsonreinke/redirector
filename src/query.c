@@ -49,13 +49,41 @@ static unsigned char *redirector_query_create_subdomain(const unsigned char *dom
     return subdomain;
 }
 
+//Private
+static struct __res_state redirector_state;
+static res_state p_redirector_state = NULL;
+
+static res_state redirector_query_init() {
+    if(p_redirector_state == NULL) {
+        p_redirector_state = &redirector_state;
+
+        redirector_state.options = RES_STAYOPEN;
+
+        if(res_ninit(p_redirector_state) == -1) {
+            p_redirector_state = NULL;
+        }
+    }
+
+    return p_redirector_state;
+}
+
+extern void redirector_query_deinit() {
+    if(p_redirector_state != NULL) {
+        res_nclose(p_redirector_state);
+        p_redirector_state = NULL;
+    }
+}
+
 static int _redirector_query(const unsigned char *subdomain, int type, unsigned char **dest) {
     int result;
     unsigned char buffer[BUFFER_SIZE];
     ns_msg msg;
     ns_rr rr;
-    struct __res_state state;
-    res_state p_state = &state;
+    res_state p_state = redirector_query_init();
+
+    if(p_state == NULL) {
+        return REDIRECTOR_ERROR;
+    }
 
     if(dest == NULL) {
         return REDIRECTOR_ERROR;
@@ -66,46 +94,36 @@ static int _redirector_query(const unsigned char *subdomain, int type, unsigned 
         return REDIRECTOR_ERROR;
     }
 
-    //Keep connection open to name server
-    state.options = RES_STAYOPEN;
-
-    if(res_ninit(p_state) == -1) {
-        return REDIRECTOR_ERROR;
-    }
-
     //Query domain for text
     result = res_nsearch(p_state, (const char *)subdomain, ns_c_in, type, buffer, sizeof(buffer));
-
     int res_h_errno = p_state->res_h_errno;
 
-    res_nclose(p_state);
-
     if(result == -1) {
-        debug_print("Error %s under %s", hstrerror(res_h_errno), subdomain);
+        redirector_debug_print("Error %s under %s", hstrerror(res_h_errno), subdomain);
         return REDIRECTOR_ERROR;
     }
     else if(result < 1) {
-        debug_print("Nothing under %s", subdomain);
+        redirector_debug_print("Nothing under %s", subdomain);
         return REDIRECTOR_OK;
     }
 
     //Parse response into messages
     result = ns_initparse(buffer, result, &msg);
     if(result == -1) {
-        debug_print("Failed to parse message buffer under %s", subdomain);
+        redirector_debug_print("Failed to parse message buffer under %s", subdomain);
         return REDIRECTOR_ERROR;
     }
 
     //Count the number of messages
     result = ns_msg_count(msg, ns_s_an);
     if(result < 1) {
-        debug_print("No records found under %s", subdomain);
+        redirector_debug_print("No records found under %s", subdomain);
         return REDIRECTOR_OK;
     }
 
     result = ns_parserr(&msg, ns_s_an, 0, &rr);
     if(result == -1) {
-        debug_print("Failed to parse the response buffer under %s", subdomain);
+        redirector_debug_print("Failed to parse the response buffer under %s", subdomain);
         return REDIRECTOR_ERROR;
     }
 
@@ -126,7 +144,7 @@ extern int redirector_query_txt(const unsigned char *domain, unsigned char **des
 
     //Create subdomain without "www"
     subdomain = redirector_query_create_subdomain(domain);
-    debug_print("Created subdomain %s", subdomain);
+    redirector_debug_print("Created subdomain %s", subdomain);
 
     int result = _redirector_query(subdomain, T_TXT, dest);
     free(subdomain);
@@ -160,7 +178,7 @@ extern int redirector_query_uri(const unsigned char *domain, unsigned char **des
 
     //Just remove "www", don't add subdomain
     subdomain = redirector_query_remove_www(domain);
-    debug_print("Created subdomain %s", subdomain);
+    redirector_debug_print("Created subdomain %s", subdomain);
 
     int result = _redirector_query(subdomain, T_URI, dest);
     free(subdomain);

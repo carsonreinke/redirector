@@ -4,7 +4,7 @@
 #include "uri.h"
 #include "redirector.h"
 
-unsigned char *redirector(const unsigned char *domain) {
+extern unsigned char *redirector(const unsigned char *domain) {
     int result;
     unsigned char *raw;
     unsigned char *formatted;
@@ -17,7 +17,7 @@ unsigned char *redirector(const unsigned char *domain) {
         return NULL;
     }
 
-    formatted = redirect_uri_normalize(raw);
+    formatted = redirector_uri_normalize(raw);
     free(raw);
     return formatted;
 }

@@ -48,7 +48,7 @@ static bool redirector_uri_valid(UriUriA *uri) {
     return true;
 }
 
-static UriUriA *redirect_uri_parse(const unsigned char* source) {
+static UriUriA *redirector_uri_parse(const unsigned char* source) {
     UriUriA *uri;
     int result;
 
@@ -58,12 +58,12 @@ static UriUriA *redirect_uri_parse(const unsigned char* source) {
     
     uri = malloc(sizeof(UriUriA));
     if(uri == NULL) {
-        debug_print("%s", "malloc failed");
+        redirector_debug_print("%s", "malloc failed");
         return NULL;
     }
 
     if( (result = (uriParseSingleUriA(uri, (const char *)source, NULL))) != URI_SUCCESS) {
-        debug_print("Failed to parse %s because %d", source, result);
+        redirector_debug_print("Failed to parse %s because %d", source, result);
         free(uri);
         return NULL;
     }
@@ -71,7 +71,7 @@ static UriUriA *redirect_uri_parse(const unsigned char* source) {
     return uri;
 }
 
-extern unsigned char *redirect_uri_normalize(const unsigned char* source) {
+extern unsigned char *redirector_uri_normalize(const unsigned char* source) {
     UriUriA *uri;
     int size;
     unsigned char *dest;
@@ -81,17 +81,17 @@ extern unsigned char *redirect_uri_normalize(const unsigned char* source) {
         return NULL;
     }
 
-    uri = redirect_uri_parse(source);
+    uri = redirector_uri_parse(source);
 
     if(!redirector_uri_valid(uri)) {
-        debug_print("URI is not valid %s", source);
+        redirector_debug_print("URI is not valid %s", source);
         uriFreeUriMembersA(uri);
         free(uri);
         return NULL;
     }
 
     if((result = uriToStringCharsRequiredA(uri, &size)) != URI_SUCCESS) {
-        debug_print("URI %s unable to get size because %d", source, result);
+        redirector_debug_print("URI %s unable to get size because %d", source, result);
         uriFreeUriMembersA(uri);
         free(uri);
         return NULL;
@@ -100,14 +100,14 @@ extern unsigned char *redirect_uri_normalize(const unsigned char* source) {
 
     dest = calloc(size, sizeof(unsigned char));
     if(dest == NULL) {
-        debug_print("%s", "calloc failure");
+        redirector_debug_print("%s", "calloc failure");
         uriFreeUriMembersA(uri);
         free(uri);
         return NULL;
     }
 
     if((result = uriToStringA((char *)dest, uri, size, NULL)) != URI_SUCCESS) {
-        debug_print("URI %s cannot be converted to string because %d", source, result);
+        redirector_debug_print("URI %s cannot be converted to string because %d", source, result);
         uriFreeUriMembersA(uri);
         free(uri);
         free(dest);

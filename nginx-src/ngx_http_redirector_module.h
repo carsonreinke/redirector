@@ -1,6 +1,7 @@
 #include <ngx_config.h>
 #include <ngx_core.h>
 #include <ngx_http.h>
+#include "../src/query.h"
 
 #ifndef NGX_HTTP_REDIRECTOR_MODULE_H
 #define NGX_HTTP_REDIRECTOR_MODULE_H
@@ -11,7 +12,6 @@
     static ngx_int_t ngx_http_redirector_handler(ngx_http_request_t *r);
     static void *ngx_http_redirector_create_loc_conf(ngx_conf_t *cf);
     static char *ngx_http_redirector_merge_loc_conf(ngx_conf_t *cf, void *parent, void *child);
-    //static char *ngx_http_redirector(ngx_conf_t *cf, ngx_command_t *cmd, void *conf);
 
     static ngx_command_t ngx_http_redirector_commands[] = {
         { 
@@ -53,7 +53,7 @@
         NULL,                                  /* init thread */
         NULL,                                  /* exit thread */
         NULL,                                  /* exit process */
-        NULL,                                  /* exit master */
+        redirector_query_deinit,                                  /* exit master */
         NGX_MODULE_V1_PADDING
     };
 
