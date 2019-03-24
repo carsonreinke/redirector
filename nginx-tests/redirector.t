@@ -85,3 +85,13 @@ GET /?testing=it
 --- error_code: 301
 --- response_headers
 Location: http://example.org/?testing=it
+
+== TEST 8: punycode
+--- config
+redirector ✔️.example.com;
+--- request
+GET /
+--- response_body_like: Moved Permanently
+--- error_code: 301
+--- response_headers
+Location: http://example.org/

@@ -70,7 +70,7 @@ START_TEST (test_punycode) {
     int length = redirector_query_txt("✔️.example.com", &result);
     ck_assert_int_ne(REDIRECTOR_ERROR, length);
     ck_assert_ptr_nonnull(result);
-    ck_assert_str_eq("http://✔️.example.org", result);
+    ck_assert_str_eq("http://example.org", result);
     free(result);
 }
 END_TEST
@@ -191,6 +191,14 @@ START_TEST (test_redirector_overflow) {
 }
 END_TEST
 
+START_TEST (test_redirector_punycode) {
+    unsigned char *result;
+    result = redirector("✔️.example.com", NULL);
+    ck_assert_str_eq("http://example.org/", result);
+    free(result);
+}
+END_TEST
+
 Suite * redirector_suite(void)
 {
     Suite *s;
@@ -228,6 +236,7 @@ Suite * redirector_suite(void)
     tcase_add_test(tc_redirector, test_redirector);
     tcase_add_test(tc_redirector, test_redirector_malformed);
     tcase_add_test(tc_redirector, test_redirector_overflow);
+    tcase_add_test(tc_redirector, test_redirector_punycode);
     suite_add_tcase(s, tc_redirector);
 
     return s;

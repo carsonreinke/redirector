@@ -18,4 +18,10 @@ env \
     LD_PRELOAD=$RESOLV_WRAPPER_FILE \
     RESOLV_WRAPPER_HOSTS=$MODULE_PATH/tests/resolv-mock.conf \
     RESOLV_WRAPPER_DEBUGLEVEL=4 make check
-cat $MODULE_PATH/tests/test-suite.log
+export RETURN_STATUS=$?
+
+#Only output log if there is a failure
+if [[ $RETURN_STATUS -ne 0 ]]; then
+    cat $MODULE_PATH/tests/test-suite.log
+    exit $RETURN_STATUS
+fi
