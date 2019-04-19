@@ -89,7 +89,7 @@ extern unsigned char *redirector_uri_normalize(const unsigned char *source, unsi
 
     //Nothing provided, default to root
     if(sourcePath == NULL) {
-        sourcePath = "./";
+        sourcePath = (unsigned char *)"./";
     }
 
     uri = redirector_uri_parse(source);
