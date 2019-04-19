@@ -10,7 +10,7 @@ extern unsigned char *redirector(const unsigned char *domain, unsigned char *req
     unsigned char *formatted;
 
     if(request_uri == NULL) {
-        request_uri = "/";
+        request_uri = (unsigned char *)"/";
     }
 
     result = redirector_query_txt(domain, &raw);
