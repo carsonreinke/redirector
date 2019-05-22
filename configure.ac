@@ -1,7 +1,7 @@
 AC_INIT([redirector], [1.0], [carson@reinke.co])
 AM_PROG_AR
 
-AM_INIT_AUTOMAKE([-Wall -Wextra -Werror foreign])
+AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
 #?
 #AC_CONFIG_MACRO_DIRS([m4])
