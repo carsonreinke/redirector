@@ -109,7 +109,7 @@ static int _redirector_query(const unsigned char *subdomain, int type, unsigned 
     int res_h_errno = p_state->res_h_errno;
 
     if(result == -1) {
-        redirector_debug_print("Error %s under %s", hstrerror(res_h_errno), subdomain);
+        redirector_debug_print("Error %s (%d) under %s", hstrerror(res_h_errno), res_h_errno, subdomain);
         return REDIRECTOR_ERROR;
     }
     else if(result < 1) {
