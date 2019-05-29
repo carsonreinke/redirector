@@ -181,6 +181,7 @@ extern int redirector_query_txt(const unsigned char *domain, unsigned char **des
         return redirector_strlen(*dest);
     }
     else {
+        redirector_debug_print("%s contains %s which is not RFC1464 compatiable", subdomain, *dest);
         free(*dest);
         *dest = NULL;
         return REDIRECTOR_ERROR;
