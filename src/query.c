@@ -24,7 +24,7 @@ static unsigned char *redirector_query_remove_www(const unsigned char *domain) {
         return NULL;
     }
 
-    if(redirector_strstr(lower_domain, DOMAIN_WWW) == (char *)lower_domain) {
+    if(redirector_strstr(lower_domain, DOMAIN_WWW) == lower_domain) {
         redirector_strcpy(new_domain, domain + redirector_strlen(DOMAIN_WWW));
     }
     else {
@@ -169,7 +169,7 @@ extern int redirector_query_txt(const unsigned char *domain, unsigned char **des
 
     //Super simple support RFC1464
     //TODO Double check this
-    if(redirector_strstr(*dest, VALUE_PREFIX) == (char *)*dest) {
+    if(redirector_strstr(*dest, VALUE_PREFIX) == *dest) {
         unsigned char *new_dest = calloc(redirector_strlen(*dest) - redirector_strlen(VALUE_PREFIX) + 1, sizeof(unsigned char));
         if(new_dest == NULL) {
            redirector_debug_print("%s", "calloc failed");
@@ -181,7 +181,7 @@ extern int redirector_query_txt(const unsigned char *domain, unsigned char **des
         return redirector_strlen(*dest);
     }
     else {
-        redirector_debug_print("%s contains %s which is not RFC1464 compatiable", subdomain, *dest);
+        redirector_debug_print("Contains %s which is not RFC1464 compatiable", *dest);
         free(*dest);
         *dest = NULL;
         return REDIRECTOR_ERROR;

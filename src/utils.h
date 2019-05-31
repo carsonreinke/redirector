@@ -20,11 +20,11 @@
 
     #define redirector_strlen(source) strlen((const char *)source)
 
-    #define redirector_strstr(haystack, needle) strstr((const char *)(haystack), (const char *)(needle))
+    #define redirector_strstr(haystack, needle) (unsigned char *)strstr((const char *)(haystack), (const char *)(needle))
 
-    #define redirector_strcpy(dest, src) strcpy((char *)(dest), (const char *)(src))
+    #define redirector_strcpy(dest, src) (unsigned char *)strcpy((char *)(dest), (const char *)(src))
 
-    #define redirector_strcat(dest, src) strcat((char *)(dest), (const char *)(src))
+    #define redirector_strcat(dest, src) (unsigned char *)strcat((char *)(dest), (const char *)(src))
 
-    #define redirector_strncpy(dest, src, n) strncpy((char *)(dest), (const char *)(src), (n))
+    #define redirector_strncpy(dest, src, n) (unsigned char *)strncpy((char *)(dest), (const char *)(src), (n))
 #endif
