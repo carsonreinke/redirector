@@ -151,6 +151,7 @@ static int _redirector_query(const unsigned char *subdomain, int type, unsigned 
 
 extern int redirector_query_txt(const unsigned char *domain, unsigned char **dest) {
     unsigned char *subdomain;
+    unsigned char *offset;
 
     if(domain == NULL) {
         return REDIRECTOR_ERROR;
@@ -167,15 +168,19 @@ extern int redirector_query_txt(const unsigned char *domain, unsigned char **des
         return result;
     }
 
+    //TXT records contains a 1 byte length of the text
+    //https://stackoverflow.com/questions/11645020/c-query-txt-record
+    offset = (*dest) + 1;
+
     //Super simple support RFC1464
     //TODO Double check this
-    if(redirector_strstr(*dest, VALUE_PREFIX) == *dest) {
-        unsigned char *new_dest = calloc(redirector_strlen(*dest) - redirector_strlen(VALUE_PREFIX) + 1, sizeof(unsigned char));
+    if(redirector_strstr(offset, VALUE_PREFIX) == offset) {
+        unsigned char *new_dest = calloc(redirector_strlen(offset) - redirector_strlen(VALUE_PREFIX) + 1, sizeof(unsigned char));
         if(new_dest == NULL) {
            redirector_debug_print("%s", "calloc failed");
            return REDIRECTOR_ERROR; 
         }
-        redirector_strcpy(new_dest, *dest + redirector_strlen(VALUE_PREFIX));
+        redirector_strcpy(new_dest, offset + redirector_strlen(VALUE_PREFIX));
         free(*dest);
         *dest = new_dest;
         return redirector_strlen(*dest);
