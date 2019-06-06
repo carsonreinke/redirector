@@ -69,13 +69,14 @@ static ngx_int_t ngx_http_redirector_handler(ngx_http_request_t *r)
 }
 
 static void *ngx_http_redirector_create_loc_conf(ngx_conf_t *cf) {
-    ngx_http_redirector_loc_conf_t  *conf;
+    ngx_http_redirector_loc_conf_t *conf;
 
     conf = ngx_pcalloc(cf->pool, sizeof(ngx_http_redirector_loc_conf_t));
     if(conf == NULL) {
         return NULL;
     }
 
+    conf->domain = NULL;
     return conf;
 }
 
@@ -87,6 +88,11 @@ static char *ngx_http_redirector_merge_loc_conf(ngx_conf_t *cf, void *parent, vo
     //Supply the selected domain from the parents to the children
     if(prev->domain) {
         conf->domain = prev->domain;
+    }
+
+    //Nothing there, no handler needed
+    if(conf->domain == NULL) {
+        return NGX_CONF_OK;
     }
 
     //Supply our handler if none is supplied

@@ -10,7 +10,7 @@ repeat_each(2);
 run_tests();
 
 __DATA__
-=== TEST 1: valid
+=== valid
 --- config
 redirector example.com;
 --- request
@@ -20,7 +20,7 @@ GET /
 --- response_headers
 Location: http://example.org/
 
-=== TEST 2: missing
+=== missing
 --- config
 redirector missing.example.com;
 --- request
@@ -30,7 +30,7 @@ GET /
 --- response_headers
 ! Location
 
-=== TEST 3: location
+=== location
 --- config
 redirector example.com;
 
@@ -43,7 +43,7 @@ GET /test
 --- response_headers
 Location: http://example.org/test
 
-=== TEST 4: override location
+=== override location
 --- config
 redirector example.com;
 
@@ -56,7 +56,7 @@ GET /test
 --- response_headers
 ! Location
 
-=== TEST 5: server variable
+=== server variable
 --- config
 redirector $server_name;
 --- request
@@ -66,7 +66,7 @@ GET /
 --- response_headers
 Location: http://example.org/
 
-=== TEST 6: invalid path
+=== invalid path
 --- config
 redirector example.com;
 --- request
@@ -76,7 +76,7 @@ GET http://example.net/
 --- response_headers
 Location: http://example.org/
 
-=== TEST 7: valid query string
+=== valid query string
 --- config
 redirector example.com;
 --- request
@@ -86,7 +86,7 @@ GET /?testing=it
 --- response_headers
 Location: http://example.org/?testing=it
 
-== TEST 8: punycode
+=== punycode
 --- config
 redirector ✔️.example.com;
 --- request
@@ -95,3 +95,26 @@ GET /
 --- error_code: 301
 --- response_headers
 Location: http://example.org/
+
+=== default
+--- config
+--- request
+GET /
+--- response_body_like: It works!
+--- error_code: 200
+--- response_headers
+! Location
+
+=== override
+--- config
+redirector example.com;
+
+location /.test/ {
+    return 200;
+}
+--- request
+GET /.test/
+--- response_body_like: 
+--- error_code: 200
+--- response_headers
+! Location

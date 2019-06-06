@@ -53,7 +53,7 @@
         NULL,                                  /* init thread */
         NULL,                                  /* exit thread */
         NULL,                                  /* exit process */
-        redirector_query_deinit,                                  /* exit master */
+        NULL,                                  /* exit master */
         NGX_MODULE_V1_PADDING
     };
 
