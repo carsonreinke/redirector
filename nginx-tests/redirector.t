@@ -35,13 +35,13 @@ GET /
 redirector example.com;
 
 location /test {
+    return 200;
 }
 --- request
 GET /test
---- response_body_like: Moved Permanently
---- error_code: 301
+--- error_code: 200
 --- response_headers
-Location: http://example.org/test
+! Location
 
 === override location
 --- config
@@ -109,12 +109,12 @@ GET /
 --- config
 redirector example.com;
 
-location /.test/ {
-    return 200;
+location /tests/ {
+    root ../../tests/html;
+    index index.html;
 }
 --- request
-GET /.test/
---- response_body_like: 
+GET /tests/
 --- error_code: 200
 --- response_headers
 ! Location

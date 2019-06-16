@@ -97,7 +97,12 @@ static char *ngx_http_redirector_merge_loc_conf(ngx_conf_t *cf, void *parent, vo
 
     //Supply our handler if none is supplied
     clcf = ngx_http_conf_get_module_loc_conf(cf, ngx_http_core_module);
-    if(clcf->handler == NULL) {
+
+    //Only apply handler if
+    //1. There is no handler
+    //2. The root unnamed server location
+    //3. The "/" location
+    if(clcf->handler == NULL && (clcf->name.len == 0 || ngx_strcmp(clcf->name.data, "/") == 0)) {
         clcf->handler = ngx_http_redirector_handler;
     }
 
