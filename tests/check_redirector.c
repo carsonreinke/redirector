@@ -138,6 +138,16 @@ START_TEST (test_uri_append_uri) {
 }
 END_TEST
 
+START_TEST (test_uri_query_string) {
+    unsigned char *result;
+
+    result = redirector_uri_normalize("https://example.com?utm_source=news4&utm_medium=email&utm_campaign=spring-summer", "/");
+    ck_assert_str_eq("https://example.com/?utm_source=news4&utm_medium=email&utm_campaign=spring-summer", result);
+
+    free(result);
+}
+END_TEST
+
 START_TEST (test_uri_ftp) {
     unsigned char *uri = "ftp://example.org";
     unsigned char *result;
@@ -199,6 +209,16 @@ START_TEST (test_redirector_punycode) {
 }
 END_TEST
 
+START_TEST (test_query_string) {
+    unsigned char *result;
+    int length = redirector_query_txt("qs.example.com", &result);
+    ck_assert_int_ne(REDIRECTOR_ERROR, length);
+    ck_assert_ptr_nonnull(result);
+    ck_assert_str_eq("https://example.com?utm_source=news4&utm_medium=email&utm_campaign=spring-summer", result);
+    free(result);
+}
+END_TEST
+
 Suite * redirector_suite(void)
 {
     Suite *s;
@@ -220,6 +240,7 @@ Suite * redirector_suite(void)
     tcase_add_test(tc_query, test_underflow);
     tcase_add_test(tc_query, test_empty);
     tcase_add_test(tc_query, test_overflow);
+    tcase_add_test(tc_query, test_query_string);
     suite_add_tcase(s, tc_query);
 
     tc_uri = tcase_create("uri");
@@ -230,6 +251,7 @@ Suite * redirector_suite(void)
     tcase_add_test(tc_uri, test_uri_garbage);
     tcase_add_test(tc_uri, test_uri_append_path);
     tcase_add_test(tc_uri, test_uri_append_uri);
+    tcase_add_test(tc_uri, test_uri_query_string);
     suite_add_tcase(s, tc_uri);
 
     tc_redirector = tcase_create("redirector");

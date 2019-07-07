@@ -114,6 +114,12 @@ extern unsigned char *redirector_uri_normalize(const unsigned char *source, unsi
     }
 
     result = uriAddBaseUriA(uriDest, path, uri);
+
+    //If the source URI has a query string, but not the path, just append the query string as-is
+    if(result == URI_SUCCESS && path->query.first == NULL && uri->query.first != NULL) {
+        uriDest->query = uri->query;
+    }
+
     uriFreeUriMembersA(uri);
     uriFreeUriMembersA(path);
     free(uri);

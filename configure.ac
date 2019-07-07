@@ -1,4 +1,4 @@
-AC_INIT([redirector], [1.0], [carson@reinke.co])
+AC_INIT([redirector], [0.0.1], [carson@reinke.co])
 AM_PROG_AR
 
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
