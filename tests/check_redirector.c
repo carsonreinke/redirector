@@ -112,7 +112,7 @@ START_TEST (test_uri_valid_path) {
     unsigned char *result;
 
     result = redirector_uri_normalize(uri, NULL);
-    ck_assert_str_eq(uri, result);
+    ck_assert_str_eq("https://example.org/", result);
 
     free(result);
 }
@@ -142,8 +142,24 @@ START_TEST (test_uri_query_string) {
     unsigned char *result;
 
     result = redirector_uri_normalize("https://example.com?utm_source=news4&utm_medium=email&utm_campaign=spring-summer", "/");
-    ck_assert_str_eq("https://example.com/?utm_source=news4&utm_medium=email&utm_campaign=spring-summer", result);
+    ck_assert_str_eq("https://example.com/", result);
+    free(result);
 
+    result = redirector_uri_normalize("https://example.com/", "/?utm_source=news4&utm_medium=email&utm_campaign=spring-summer");
+    ck_assert_str_eq("https://example.com/?utm_source=news4&utm_medium=email&utm_campaign=spring-summer", result);
+    free(result);
+}
+END_TEST
+
+START_TEST (test_uri_path) {
+    unsigned char *result;
+
+    result = redirector_uri_normalize("http://example.com/path", "/");
+    ck_assert_str_eq("http://example.com/", result);
+    free(result);
+
+    result = redirector_uri_normalize("http://example.com/", "/path");
+    ck_assert_str_eq("http://example.com/path", result);
     free(result);
 }
 END_TEST
@@ -252,6 +268,7 @@ Suite * redirector_suite(void)
     tcase_add_test(tc_uri, test_uri_append_path);
     tcase_add_test(tc_uri, test_uri_append_uri);
     tcase_add_test(tc_uri, test_uri_query_string);
+    tcase_add_test(tc_uri, test_uri_path);
     suite_add_tcase(s, tc_uri);
 
     tc_redirector = tcase_create("redirector");

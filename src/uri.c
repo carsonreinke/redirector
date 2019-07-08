@@ -89,7 +89,7 @@ extern unsigned char *redirector_uri_normalize(const unsigned char *source, unsi
 
     //Nothing provided, default to root
     if(sourcePath == NULL) {
-        sourcePath = (unsigned char *)"./";
+        sourcePath = (unsigned char *)"/";
     }
 
     uri = redirector_uri_parse(source);
@@ -115,10 +115,19 @@ extern unsigned char *redirector_uri_normalize(const unsigned char *source, unsi
 
     result = uriAddBaseUriA(uriDest, path, uri);
 
-    //If the source URI has a query string, but not the path, just append the query string as-is
-    if(result == URI_SUCCESS && path->query.first == NULL && uri->query.first != NULL) {
-        uriDest->query = uri->query;
-    }
+    //Reverted back to RFC3986 5.2.2 compatiability for now
+    /*if(result == URI_SUCCESS) {
+        //If the source URI has a path, but not the path, append the path
+        if(path->pathHead == NULL && uri->pathHead != NULL) {
+           uriDest->pathHead = uri->pathHead;
+           uriDest->pathTail = uri->pathTail;
+        }
+        
+        //If the source URI has a query string, but not the path, just append the query string as-is
+        if(path->query.first == NULL && uri->query.first != NULL) {
+           uriDest->query = uri->query;
+        }
+    }*/
 
     uriFreeUriMembersA(uri);
     uriFreeUriMembersA(path);

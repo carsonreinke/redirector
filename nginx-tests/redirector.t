@@ -127,4 +127,4 @@ GET /
 --- response_body_like: Moved Permanently
 --- error_code: 301
 --- response_headers
-Location: https://example.com/?utm_source=news4&utm_medium=email&utm_campaign=spring-summer
+Location: https://example.com/
