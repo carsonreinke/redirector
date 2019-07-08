@@ -164,6 +164,15 @@ START_TEST (test_uri_path) {
 }
 END_TEST
 
+START_TEST (test_uri_scheme) {
+    unsigned char *result;
+
+    result = redirector_uri_normalize("//example.com", "/");
+    ck_assert_ptr_null(result);
+    free(result);
+}
+END_TEST
+
 START_TEST (test_uri_ftp) {
     unsigned char *uri = "ftp://example.org";
     unsigned char *result;
@@ -269,6 +278,7 @@ Suite * redirector_suite(void)
     tcase_add_test(tc_uri, test_uri_append_uri);
     tcase_add_test(tc_uri, test_uri_query_string);
     tcase_add_test(tc_uri, test_uri_path);
+    tcase_add_test(tc_uri, test_uri_scheme);
     suite_add_tcase(s, tc_uri);
 
     tc_redirector = tcase_create("redirector");

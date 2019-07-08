@@ -23,7 +23,18 @@ The `HOST_NAME` must point to the server and have one of the following:
 * TXT record under `_redirect.[HOST NAME]` containing `uri=[URI]` ([RFC1464](https://tools.ietf.org/html/rfc1464) format)
 * URI record under `[HOST NAME]` containing `[URI]`
 
-Puny-code domains and DNS entries are supported.
+Puny-code domains and DNS entries are supported.  URIs are relatively transformed using [RFC3986 Section 5.2.2](https://tools.ietf.org/html/rfc3986#section-5.2.2). 
+
+Below are some examples of what would be returned:
+
+|DNS Entry (for example.com)|Requested URI|Response URI|
+|--|--|--|
+|`uri=http://example.org`|http://example.com/|http://example.org/|
+|`uri=http://example.org?query=string`|http://example.com/|http://example.org/|
+|`uri=http://example.org?query=string`|http://example.com/?other=string|http://example.org/?other=string|
+|`uri=http://example.org/path`|http://example.com/|http://example.org/|
+|`uri=http://example.org/path`|http://example.com/otherpath|http://example.org/otherpath/|
+|`uri=//example.org`|http://example.com/|`404 Not Found`|
 
 ## Testing
 
