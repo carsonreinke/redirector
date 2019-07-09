@@ -3,9 +3,6 @@ AM_PROG_AR
 
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 
-#?
-#AC_CONFIG_MACRO_DIRS([m4])
-
 # Checks for programs.
 AC_PROG_CC
 AC_PROG_LIBTOOL
@@ -18,7 +15,9 @@ AC_CHECK_LIB(uriparser, uriParseSingleUriA)
 
 # 
 AC_HEADER_STDC
-#AC_CHECK_HEADERS([check.h])
+AC_CHECK_HEADERS([check.h])
+AC_CHECK_HEADERS([idn2.h])
+AC_CHECK_HEADERS([uriparser/Uri.h])
 
 AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([

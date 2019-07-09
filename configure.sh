@@ -1,3 +1,3 @@
 #!/bin/bash
 
-autoreconf && ./configure
+autoreconf --install && ./configure

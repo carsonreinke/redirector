@@ -39,7 +39,11 @@ Below are some examples of what would be returned:
 
 ## Testing
 
-Testing is accomplished is two separate pieces either non-Nginx (`libcheck`) or Nginx (`Test::Nginx`).  Both of these tests require use of `resolv_wrapper` to mock DNS responses.  There are four shell scripts to assist with executing the test cases:
+Testing is accomplished is two separate pieces either non-Nginx (`libcheck`) or Nginx (`Test::Nginx`).  Both of these tests require use of `resolv_wrapper` to mock DNS responses.
+
+Before running tests, run `./configure.sh` for automake and make to setup the build.
+
+There are four shell scripts to assist with executing the test cases:
 
 * `test-all.sh [RESOLV WRAPPER FILE] [NGINX PATH]` - run all test cases
 * `test.sh [RESOLV WRAPPER FILE]` - run non-Nginx test cases
