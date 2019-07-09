@@ -21,7 +21,7 @@ Within the Nginx `server` configuration add `redirector [HOST NAME];`.
 
 The `HOST_NAME` must point to the server and have one of the following:
 * TXT record under `_redirect.[HOST NAME]` containing `uri=[URI]` ([RFC1464](https://tools.ietf.org/html/rfc1464) format)
-* URI record under `[HOST NAME]` containing `[URI]`
+* [URI](https://tools.ietf.org/html/rfc7553) record under `[HOST NAME]` containing `[URI]`
 
 Puny-code domains and DNS entries are supported.  `www` subdomain will automatically be assumed to be the root domain.  URIs are relatively transformed using [RFC3986 Section 5.2.2](https://tools.ietf.org/html/rfc3986#section-5.2.2). 
 
